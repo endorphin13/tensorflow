@@ -22,6 +22,7 @@ limitations under the License.
 #include "xla/client/local_client.h"
 #include "xla/pjrt/pjrt_client.h"
 #include "xla/stream_executor/stream.h"
+#include "xla/tsl/framework/device_type.h"
 #include "tensorflow/core/framework/device_base.h"
 #include "tensorflow/core/framework/function.h"
 
@@ -37,8 +38,7 @@ XlaCompiler::Options GenerateCompilerOptions(
 
 // Returns created options for XLA compiler when TFRT-TPU is used.
 XlaCompiler::Options GenerateCompilerOptionsForTfrtTpu(
-    const DeviceCompiler<xla::LocalExecutable, xla::LocalClient>&
-        xla_device_compiler,
+    const tsl::DeviceType& device_type,
     const FunctionLibraryRuntime& function_library);
 
 // Returns created options for XLA compiler when PjRt (Device API) is used for

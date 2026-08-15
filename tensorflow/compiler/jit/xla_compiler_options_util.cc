@@ -25,6 +25,7 @@ limitations under the License.
 #include "xla/stream_executor/host/host_platform_id.h"
 #include "xla/stream_executor/stream.h"
 #include "xla/tsl/framework/device_id_utils.h"
+#include "xla/tsl/framework/device_type.h"
 #include "tensorflow/core/framework/device_base.h"
 #include "tensorflow/core/framework/function.h"
 #include "tensorflow/core/framework/types.h"
@@ -59,7 +60,6 @@ XlaCompiler::Options GenerateCompilerOptions(
     se::Stream* stream, const XlaPlatformInfo& platform_info,
     bool has_ref_vars) {
   XlaCompiler::Options options;
-  options.client = static_cast<xla::LocalClient*>(xla_device_compiler.client());
   if (stream != nullptr) {
     options.device_ordinal = stream->parent()->device_ordinal();
   }
@@ -83,11 +83,11 @@ XlaCompiler::Options GenerateCompilerOptions(
 }
 
 XlaCompiler::Options GenerateCompilerOptionsForTfrtTpu(
-    const XlaDeviceCompiler& xla_device_compiler,
+    const tsl::DeviceType& device_type,
     const FunctionLibraryRuntime& function_library) {
   XlaCompiler::Options options;
   // TODO(b/238830423): consider device_ordinal and shape_determination_fns.
-  options.device_type = xla_device_compiler.device_type();
+  options.device_type = device_type;
   options.flib_def = function_library.GetFunctionLibraryDefinition();
   options.graph_def_version = function_library.graph_def_version();
   options.allow_cpu_custom_calls = false;
@@ -136,6 +136,9 @@ XlaCompiler::Options GenerateCompilerOptionsForPjRt(
         metadata->default_shape_determination_fns();
   } else if (pjrt_device_compiler != nullptr) {
     options.device_type = pjrt_device_compiler->device_type();
+  }
+  if (pjrt_device_compiler != nullptr) {
+    options.client = pjrt_device_compiler->client();
   }
   // TODO(b/255826209): Confirm below options are correctly set after testing.
   options.allow_cpu_custom_calls = false;
