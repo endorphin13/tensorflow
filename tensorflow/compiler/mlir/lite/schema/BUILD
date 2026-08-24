@@ -14,9 +14,9 @@
 # ==============================================================================
 
 load("@flatbuffers//:build_defs.bzl", "flatbuffer_cc_library")
-load("@rules_cc//cc:cc_library.bzl", "cc_library")
 
 # copybara:uncomment load("@flatbuffers//:flatbuffers.bzl", "flatbuffers_library", "ts_flatbuffers_library")
+load("@rules_cc//cc:cc_library.bzl", "cc_library")
 load("//tensorflow:tensorflow.bzl", "tf_cc_test")
 load("//tensorflow:tensorflow.default.bzl", "get_compatible_with_portable")
 # copybara:uncomment load("//tools/build_defs/cc:cc_embed_data.bzl", "cc_embed_data")
