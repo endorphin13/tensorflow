@@ -22,6 +22,7 @@ limitations under the License.
 #include <string>
 #include <vector>
 
+#include "absl/container/flat_hash_map.h"
 #include "absl/status/status.h"
 #include "absl/status/statusor.h"
 #include "absl/strings/string_view.h"
@@ -38,12 +39,16 @@ limitations under the License.
 namespace xla {
 namespace hlo_isolation {
 
+using ExpectedLiteralsMap =
+    absl::flat_hash_map<std::string, std::shared_ptr<const Literal>>;
+
 struct RunModuleOptions {
   bool run_hlo_passes = false;
   bool use_fusion_debugger = false;
   absl::Span<const HloOutputCallback> hlo_output_callbacks = {};
   std::function<void(absl::string_view, Literal*)> eval_literal_mutator =
       nullptr;
+  std::shared_ptr<ExpectedLiteralsMap> expected_literals = nullptr;
 };
 
 struct ModuleIsolationOptions {
@@ -132,11 +137,6 @@ bool ModuleTestsFloatsForEquality(const HloModule& module);
 bool ComputationHasRng(const HloComputation* computation);
 bool LiteralContainsInfOrNan(const LiteralSlice& literal);
 bool ModuleContainsConstantInfOrNan(const HloModule& module);
-
-std::string GetFusionDebuggerDir();
-std::string GetFusionDebuggerFilePath(absl::string_view op_name);
-void CleanUpAllFusionDebuggerFiles();
-std::vector<std::string> GetLeftoverFusionDebuggerFiles();
 
 }  // namespace hlo_isolation
 }  // namespace xla
