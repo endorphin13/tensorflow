@@ -17,28 +17,34 @@
 #
 # Sets up custom apt sources for our TF images.
 
-# Prevent apt install tzinfo from asking our location (assumes UTC)
+set -euo pipefail
 export DEBIAN_FRONTEND=noninteractive
 
-# Set up shared custom sources
+# 1. Install prerequisites
 apt-get update
-apt-get install -y gnupg ca-certificates software-properties-common
+apt-get install -y --no-install-recommends ca-certificates curl gnupg software-properties-common
 add-apt-repository -y universe
-apt-get update
 
-# Deadsnakes: https://launchpad.net/~deadsnakes/+archive/ubuntu/ppa
-apt-key adv --keyserver keyserver.ubuntu.com --recv-keys F23C5A6CF475977595C89F51BA6932366A755776
+# 2. Prepare dedicated keyrings directory
+install -m 0755 -d /etc/apt/keyrings
 
-# LLVM/Clang: https://apt.llvm.org/
-apt-key adv --fetch-keys https://apt.llvm.org/llvm-snapshot.gpg.key
+# 3. Fetch GPG keys over HTTPS
+curl -fsSL "https://keyserver.ubuntu.com/pks/lookup?op=get&search=0xF23C5A6CF475977595C89F51BA6932366A755776" \
+  | gpg --dearmor -o /etc/apt/keyrings/deadsnakes.gpg
 
-# Set up custom sources
+curl -fsSL "https://apt.llvm.org/llvm-snapshot.gpg.key" \
+  | gpg --dearmor -o /etc/apt/keyrings/llvm.gpg
+
+# 4. Configure custom repositories with scoped 'signed-by' keys
 cat >/etc/apt/sources.list.d/custom.list <<SOURCES
-# More Python versions: Deadsnakes
-deb http://ppa.launchpad.net/deadsnakes/ppa/ubuntu jammy main
-deb-src http://ppa.launchpad.net/deadsnakes/ppa/ubuntu jammy main
+# Deadsnakes (Python 3.10 - 3.14)
+deb [signed-by=/etc/apt/keyrings/deadsnakes.gpg] https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main
+deb-src [signed-by=/etc/apt/keyrings/deadsnakes.gpg] https://ppa.launchpadcontent.net/deadsnakes/ppa/ubuntu jammy main
 
-# LLVM/Clang repository
-deb http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main
-deb-src http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main
+# LLVM/Clang
+deb [signed-by=/etc/apt/keyrings/llvm.gpg] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main
+deb-src [signed-by=/etc/apt/keyrings/llvm.gpg] http://apt.llvm.org/jammy/ llvm-toolchain-jammy-18 main
 SOURCES
+
+# 5. Refresh package cache
+apt-get update
