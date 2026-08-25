@@ -82,7 +82,7 @@ single_version_override(
         # The following patch is needed to fix package loading for `bazel query "deps(//xla/...)"`.
         "//third_party/protobuf:fix_python_dist_package.patch",
     ],
-    version = "32.1",
+    version = "34.1",
 )
 
 # Use an unreleased version of googletest
