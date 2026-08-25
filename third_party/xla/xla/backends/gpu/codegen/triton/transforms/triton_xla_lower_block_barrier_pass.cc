@@ -52,7 +52,7 @@ LogicalResult LowerBlockBarrierOp(BlockBarrierOp block_barrier,
       block_barrier.getSignalValue();
   const int32_t world_size = block_barrier.getWorldSize();
   // Triton magic constant.
-  constexpr int32_t kGlobalAddressSpace = 1;
+  constexpr auto kGlobalAddressSpace = mlir::triton::PtrAddrSpace::Global;
 
   const mlir::TypedValue<mlir::Type> world_size_op =
       mlir::arith::ConstantOp::create(builder,

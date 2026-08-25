@@ -106,10 +106,7 @@ using ReductionComputationEmitter = absl::AnyInvocable<xtile::TensorValue(
     mlir::ImplicitLocOpBuilder&, xtile::TensorValue, xtile::TensorValue)>;
 
 // The main memory space on a device (HBM).
-// Use GPU dialect address space which is platform-independent.
-static constexpr auto kGlobalAddressSpace =
-    static_cast<std::underlying_type_t<mlir::gpu::AddressSpace>>(
-        mlir::gpu::AddressSpace::Global);
+static constexpr auto kGlobalAddressSpace = ttir::PtrAddrSpace::Global;
 
 // Metadata arguments for the collective emitter.
 // device_rank, signal_value, signal_buffers.
