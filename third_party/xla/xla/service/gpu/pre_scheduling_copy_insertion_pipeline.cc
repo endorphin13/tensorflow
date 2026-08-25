@@ -19,10 +19,10 @@ limitations under the License.
 #include <memory>
 #include <utility>
 
+#include "xla/backends/gpu/transforms/alias_in_place_outputs.h"
 #include "xla/backends/gpu/transforms/alias_passthrough_params.h"
 #include "xla/backends/gpu/transforms/copy_fusion.h"
 #include "xla/backends/gpu/transforms/sanitize_constant_names.h"
-#include "xla/hlo/ir/hlo_module.h"
 #include "xla/hlo/pass/hlo_pass_pipeline.h"
 #include "xla/hlo/transforms/simplifiers/hlo_dce.h"
 #include "xla/service/copy_insertion.h"
@@ -67,6 +67,7 @@ HloPassPipeline PreSchedulingCopyInsertionPipeline(
   if (config.alias_passthrough_params()) {
     pipeline.AddPass<AliasPassthroughParams>();
   }
+  pipeline.AddPass<AliasInPlaceOutputs>();
   pipeline.AddPass<LoopScheduleLinearizer>(alias_info);
 
   if (debug_options.xla_gpu_copy_insertion_use_region_analysis()) {
