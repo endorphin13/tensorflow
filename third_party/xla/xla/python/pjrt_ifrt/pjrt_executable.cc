@@ -214,8 +214,8 @@ std::vector<ShardingRef> MakeShardings(
   shardings.reserve(memory_kinds.size());
   if (hlo_shardings.has_value()) {
     for (int i = 0; i < memory_kinds.size(); ++i) {
-      shardings.push_back(ifrt::HloSharding::Create(
-          executable_devices, memory_kinds[i], (*hlo_shardings)[i]));
+      shardings.push_back(MakeOutputSharding(
+          (*hlo_shardings)[i], shapes[i], memory_kinds[i], executable_devices));
     }
   } else if (executable_devices->size() == 1) {
     // Prefer SingleDeviceSharding over ConcreteEvenSharding, as it supports

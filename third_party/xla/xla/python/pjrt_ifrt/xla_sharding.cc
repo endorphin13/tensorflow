@@ -376,6 +376,22 @@ void HloSharding::Hash(absl::HashState state) const {
   absl::HashState::combine(std::move(state), hash);
 }
 
+ShardingRef MakeOutputSharding(const xla::HloSharding& hlo_sharding,
+                               const Shape& shape,
+                               const MemoryKind& memory_kind,
+                               const DeviceListRef& devices) {
+  ShardingRef sharding =
+      HloSharding::Create(devices, memory_kind, hlo_sharding);
+  if (hlo_sharding.UseNamedShardingLeaf()) {
+    if (auto shard_shape = sharding->GetShardShape(shape); shard_shape.ok()) {
+      return ConcreteEvenSharding::Create(devices, memory_kind, shape,
+                                          *shard_shape,
+                                          sharding->IsFullyReplicated());
+    }
+  }
+  return sharding;
+}
+
 std::vector<IndexDomain> TEST_HloShardingIndexDomainsSlowPath(
     const HloSharding& hlo_sharding, const Shape& shape,
     SingleDeviceShardSemantics single_device_shard_semantics) {

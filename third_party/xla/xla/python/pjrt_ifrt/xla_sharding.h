@@ -126,6 +126,14 @@ class HloSharding final
   mutable std::atomic<uint64_t> hash_ = kUnsetHash;
 };
 
+// Creates an IFRT Sharding for an output tensor from an HLO sharding.
+// For HloShardingV3, converts to ConcreteEvenSharding so output array metadata
+// uses native IFRT sharding representations over the wire.
+ShardingRef MakeOutputSharding(const xla::HloSharding& hlo_sharding,
+                               const Shape& shape,
+                               const MemoryKind& memory_kind,
+                               const DeviceListRef& devices);
+
 // Test only: returns `HloSharding::IndexDomains()`, using `xla::HloSharding`
 // APIs internally.
 std::vector<IndexDomain> TEST_HloShardingIndexDomainsSlowPath(
